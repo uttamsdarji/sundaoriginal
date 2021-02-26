@@ -50,6 +50,7 @@ $(document).ready(function() {
         let excelData = [];
         if(exceljson && exceljson.length > 0) {
           let columnIds = ['id','name','seo_desc','seo_keyword','vendor_id','status','m_cat_id','sub_cat_id','sub_cat_tw_id','inquiry','sdesc','desc','youtube_link','return_on','return_type','return_amt','ship_based','local_ship','state_ship','national_ship','gst_type','gst','hsn_code','weight','prod_type','prod_sku','qty','price','saleprice','admin_charge','sprice','brand_id','featured_image','image_1','image_2','image_3'];
+          let columnNames = ['Img URL 3','Product Name','SEO Decription','SEO Keyword','1##Vednor Name','Status (on / off)','Category','Sub Category','Sub Sub Category','Add to Cartb, Buy Now, Inquiry(1,2,3)','Short Description','Long Description','Youtube URL','Return  (on / off)','Return Type (fix / per)','return_amt','Shipping Type (qty / all)','Local Shipping Charge','State Shipping Charge','National Shipping Charge','GST Type (No GST / GST)','GST %','HSN Code','Weight','Product Type (1-Simple/2-Variable/3-Catalog)','SKU Code','Qty','MRP','Sale Price','Admin Charge if Multi Vendor On','Vendor Get','Brand','Feture Img'];
           let defaultValues = {
             vendor_id: '143-Website',
             status: '1-on',
@@ -65,7 +66,7 @@ $(document).ready(function() {
             prod_type: '1-simple',
           }
           let columnKeyMapping = {
-            // id: 'Code',
+            id: null,
             name: 'Product Name',
             seo_desc: 'Product Name',
             seo_keyword: 'Product Name',
@@ -103,6 +104,7 @@ $(document).ready(function() {
             image_3: null
           }
           excelData.push(Object.keys(columnKeyMapping))
+          excelData.push(Object.keys(columnNames))
           exceljson.forEach((item) => {
             let row = [];
             Object.keys(columnKeyMapping).forEach((columnKey) => {
