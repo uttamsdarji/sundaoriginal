@@ -1,0 +1,12 @@
+.page-container {
+  margin-top: 50px;
+}
+
+.excel-container .upload-container .custom-file-input {
+  cursor: pointer;
+}
+
+.logo-container img {
+  max-width: 100%;
+  margin-bottom: 50px;
+}
