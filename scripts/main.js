@@ -104,7 +104,7 @@ $(document).ready(function() {
             image_3: null
           }
           excelData.push(Object.keys(columnKeyMapping))
-          excelData.push(Object.keys(columnNames))
+          excelData.push(columnNames)
           exceljson.forEach((item) => {
             let row = [];
             Object.keys(columnKeyMapping).forEach((columnKey) => {
