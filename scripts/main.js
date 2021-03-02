@@ -84,7 +84,10 @@ $(document).ready(function() {
               row.push(item[columnKeyMapping[columnKey]])
             } else {
               let mrp = item['Sales Price']*1.05;
-              row.push(mrp || ''); 
+              if(columnKey == 'price') {
+                mrp = mrp*1.4;
+              }
+              row.push(mrp && mrp.toFixed(0) || ''); 
             }
           } else {
             if(defaultValues.hasOwnProperty(columnKey)) {
@@ -202,7 +205,7 @@ $(document).ready(function() {
       })
       let stockDiff = newStock - oldStock;
       let diffType = stockDiff > 0 ? 1 : 2;
-      row = [i.id,i.name,0,'',i.prod_sku,Math.abs(stockDiff),diffType]
+      row = [i.id,i.name,0,'',i.prod_sku,oldStock,Math.abs(stockDiff),diffType]
       if(stockDiff != 0) {
         excelData.push(row)
       }
@@ -237,10 +240,11 @@ $(document).ready(function() {
           adminPrice = j['Sales Price'];
         }
       })
-      let mrp = 1.05*adminPrice;
       let gstCharge = 0.05*adminPrice;
+      let salesPrice = 1.05*adminPrice;
+      let mrp = 1.4*salesPrice;
       let adminCharge = 0;
-      row = [i.id,i.name,0,'',i.prod_sku,5,mrp,mrp,gstCharge,adminCharge,adminPrice]
+      row = [i.id,i.name,0,'',i.prod_sku,5,mrp.toFixed(0),salesPrice.toFixed(0),gstCharge,adminCharge,adminPrice]
       excelData.push(row)
     })
     let wb = XLSX.utils.book_new();
@@ -262,9 +266,18 @@ $(document).ready(function() {
     saveAs(new Blob([sheetToArrayBuffer(wbout)], { type: "application/octet-stream" }), fileName);
   }
   function processData () {
-    let softwareDataIds = softwareData.map(i => i.Barcode)
-    let websiteDataIds = websiteData.map(i => i.prod_sku);
-    let newProductIds = softwareDataIds.filter(i => websiteDataIds.indexOf(i) == -1);
+    let softwareDataIds = softwareData.map((i) => {
+      return Number(i.Barcode) ? Number(i.Barcode) : i.Barcode
+    });
+    let websiteDataIds = websiteData.map((i) => {
+      return Number(i.prod_sku) ? Number(i.prod_sku) : i.prod_sku
+    });
+    let newProductIds = [];
+    softwareDataIds.forEach(i => {
+      if(websiteDataIds.indexOf(i) == -1) {
+        newProductIds.push(i)
+      }
+    });
     let newProducts = [];
     let stockProducts = [];
     softwareData.forEach((i) => {
