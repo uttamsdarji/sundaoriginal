@@ -210,23 +210,25 @@ $(document).ready(function() {
         excelData.push(row)
       }
     })
-    let wb = XLSX.utils.book_new();
-    let sheetNames = ['Sheet1'];
-    sheetNames.forEach((sheet) => {
-      let workSheet = sheet || 'Data';
-      wb.SheetNames.push(workSheet);
-      let newWs = XLSX.utils.aoa_to_sheet(excelData);
-      wb.Sheets[workSheet] = newWs;
-    })
-    let wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'binary' });
-    function sheetToArrayBuffer(s) {
-      var buf = new ArrayBuffer(s.length); //convert s to arrayBuffer
-      var view = new Uint8Array(buf);  //create uint8array as viewer
-      for (var i = 0; i < s.length; i++) view[i] = s.charCodeAt(i) & 0xFF; //convert to octet
-      return buf;
+    if(excelData.length > 1) {
+      let wb = XLSX.utils.book_new();
+      let sheetNames = ['Sheet1'];
+      sheetNames.forEach((sheet) => {
+        let workSheet = sheet || 'Data';
+        wb.SheetNames.push(workSheet);
+        let newWs = XLSX.utils.aoa_to_sheet(excelData);
+        wb.Sheets[workSheet] = newWs;
+      })
+      let wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'binary' });
+      function sheetToArrayBuffer(s) {
+        var buf = new ArrayBuffer(s.length); //convert s to arrayBuffer
+        var view = new Uint8Array(buf);  //create uint8array as viewer
+        for (var i = 0; i < s.length; i++) view[i] = s.charCodeAt(i) & 0xFF; //convert to octet
+        return buf;
+      }
+      let fileName = 'product_stock.xlsx';
+      saveAs(new Blob([sheetToArrayBuffer(wbout)], { type: "application/octet-stream" }), fileName);
     }
-    let fileName = 'product_stock.xlsx';
-    saveAs(new Blob([sheetToArrayBuffer(wbout)], { type: "application/octet-stream" }), fileName);
   }
   function getPriceFile(stockProducts) {
     let excelData = [];
@@ -245,32 +247,36 @@ $(document).ready(function() {
       let mrp = 1.4*salesPrice;
       let adminCharge = 0;
       row = [i.id,i.name,0,'',i.prod_sku,5,mrp.toFixed(0),salesPrice.toFixed(0),gstCharge,adminCharge,adminPrice]
-      excelData.push(row)
+      if(i.sprice != adminPrice) {
+        excelData.push(row)
+      }
     })
-    let wb = XLSX.utils.book_new();
-    let sheetNames = ['Sheet1'];
-    sheetNames.forEach((sheet) => {
-      let workSheet = sheet || 'Data';
-      wb.SheetNames.push(workSheet);
-      let newWs = XLSX.utils.aoa_to_sheet(excelData);
-      wb.Sheets[workSheet] = newWs;
-    })
-    let wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'binary' });
-    function sheetToArrayBuffer(s) {
-      var buf = new ArrayBuffer(s.length); //convert s to arrayBuffer
-      var view = new Uint8Array(buf);  //create uint8array as viewer
-      for (var i = 0; i < s.length; i++) view[i] = s.charCodeAt(i) & 0xFF; //convert to octet
-      return buf;
+    if(excelData.length > 1) {
+      let wb = XLSX.utils.book_new();
+      let sheetNames = ['Sheet1'];
+      sheetNames.forEach((sheet) => {
+        let workSheet = sheet || 'Data';
+        wb.SheetNames.push(workSheet);
+        let newWs = XLSX.utils.aoa_to_sheet(excelData);
+        wb.Sheets[workSheet] = newWs;
+      })
+      let wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'binary' });
+      function sheetToArrayBuffer(s) {
+        var buf = new ArrayBuffer(s.length); //convert s to arrayBuffer
+        var view = new Uint8Array(buf);  //create uint8array as viewer
+        for (var i = 0; i < s.length; i++) view[i] = s.charCodeAt(i) & 0xFF; //convert to octet
+        return buf;
+      }
+      let fileName = 'product_price.xlsx';
+      saveAs(new Blob([sheetToArrayBuffer(wbout)], { type: "application/octet-stream" }), fileName);
     }
-    let fileName = 'product_price.xlsx';
-    saveAs(new Blob([sheetToArrayBuffer(wbout)], { type: "application/octet-stream" }), fileName);
   }
   function processData () {
     let softwareDataIds = softwareData.map((i) => {
-      return Number(i.Barcode) ? Number(i.Barcode) : i.Barcode
+      return String(i.Barcode)
     });
     let websiteDataIds = websiteData.map((i) => {
-      return Number(i.prod_sku) ? Number(i.prod_sku) : i.prod_sku
+      return String(i.prod_sku)
     });
     let newProductIds = [];
     softwareDataIds.forEach(i => {
