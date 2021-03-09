@@ -194,6 +194,7 @@ $(document).ready(function() {
     if(totalFilesRead == 2) {
       $('#upload-btn').removeClass('disabled');
     }
+    $('#photo-update-btn').removeClass('disabled');
   }
   function getStockFile(stockProducts) {
     let excelData = [];
@@ -277,6 +278,7 @@ $(document).ready(function() {
     }
   }
   function processData () {
+    $('#loader').removeClass('hide');
     let softwareDataIds = softwareData.map((i) => {
       return String(i.Barcode)
     });
@@ -310,11 +312,58 @@ $(document).ready(function() {
     if(stockProducts && stockProducts.length > 0) {
       getPriceFile(stockProducts)
     }
+    setTimeout(() => {
+      $('#loader').addClass('hide');
+    }, 3000)
+  }
+  function photoUpdate() {
+    $('#loader').removeClass('hide');
+    let noPhotosData = [];
+    if(websiteData && websiteData.length > 0) {
+      noPhotosData = websiteData.filter(i => !i.featured_image);
+      let columnIds = ['id','name','seo_desc','seo_keyword','vendor_id','status','m_cat_id','sub_cat_id','sub_cat_tw_id','inquiry','sdesc','desc','youtube_link','return_on','return_type','return_amt','ship_based','local_ship','state_ship','national_ship','gst_type','gst','hsn_code','weight','prod_type','prod_sku','qty','price','saleprice','admin_charge','sprice','brand_id','featured_image','image_1','image_2','image_3'];
+      let columnNames = ['Img URL 3','Product Name','SEO Decription','SEO Keyword','1##Vednor Name','Status (on / off)','Category','Sub Category','Sub Sub Category','Add to Cartb, Buy Now, Inquiry(1,2,3)','Short Description','Long Description','Youtube URL','Return  (on / off)','Return Type (fix / per)','return_amt','Shipping Type (qty / all)','Local Shipping Charge','State Shipping Charge','National Shipping Charge','GST Type (No GST / GST)','GST %','HSN Code','Weight','Product Type (1-Simple/2-Variable/3-Catalog)','SKU Code','Qty','MRP','Sale Price','Admin Charge if Multi Vendor On','Vendor Get','Brand','Feture Img'];
+      let excelData = [];
+      excelData.push(columnIds);
+      excelData.push(columnNames);
+      noPhotosData.forEach((row) => {
+        let excelRow = [];
+        columnIds.forEach(id => {
+          if(id != 'featured_image') {
+            excelRow.push(row[id]);
+          } else {
+            let imageUrl = `https://sunda-products.s3.amazonaws.com/${row['prod_sku']}.jpeg`;
+            excelRow.push(imageUrl);
+          }
+        })
+        excelData.push(excelRow)
+      })
+      let wb = XLSX.utils.book_new();
+      let sheetNames = ['Sheet1'];
+      sheetNames.forEach((sheet) => {
+        let workSheet = sheet || 'Data';
+        wb.SheetNames.push(workSheet);
+        let newWs = XLSX.utils.aoa_to_sheet(excelData);
+        wb.Sheets[workSheet] = newWs;
+      })
+      let wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'binary' });
+      function sheetToArrayBuffer(s) {
+        var buf = new ArrayBuffer(s.length); //convert s to arrayBuffer
+        var view = new Uint8Array(buf);  //create uint8array as viewer
+        for (var i = 0; i < s.length; i++) view[i] = s.charCodeAt(i) & 0xFF; //convert to octet
+        return buf;
+      }
+      let fileName = 'product_images_update.xlsx';
+      saveAs(new Blob([sheetToArrayBuffer(wbout)], { type: "application/octet-stream" }), fileName);
+      $('#loader').addClass('hide');
+    }
   }
   let websiteFileInput = document.querySelector('#websiteFile');
   let softwareFileInput = document.querySelector('#softwareFile');
   let uploadBtn = document.querySelector('#upload-btn');
+  let photoUpdateBtn = document.querySelector('#photo-update-btn');
   websiteFileInput.addEventListener('change', saveFile, false);
   softwareFileInput.addEventListener('change', saveFile, false);
   uploadBtn.addEventListener('click', processData, false);
+  photoUpdateBtn.addEventListener('click', photoUpdate, false);
 })
