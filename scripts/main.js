@@ -35,6 +35,7 @@ $(document).ready(function() {
         gst: 5,
         hsn_code: 61,
         prod_type: '1-simple',
+        inquiry: '2-buy##'
       }
       let columnKeyMapping = {
         id: null,
@@ -82,8 +83,9 @@ $(document).ready(function() {
           if(columnKeyMapping[columnKey]) {
             if(['price','saleprice'].indexOf(columnKey) == -1) {
               if(columnKey == 'featured_image') {
-                let imageUrl = `https://sunda-products.s3.amazonaws.com/${item[columnKeyMapping['prod_sku']]}.jpeg`;
-                row.push(imageUrl);
+                // let imageUrl = `https://sunda-products.s3.amazonaws.com/${item[columnKeyMapping['prod_sku']]}.jpeg`;
+                // row.push(imageUrl);
+                row.push('');
               } else {
                 row.push(item[columnKeyMapping[columnKey]])
               }
@@ -332,8 +334,9 @@ $(document).ready(function() {
           if(id != 'featured_image') {
             excelRow.push(row[id]);
           } else {
-            let imageUrl = `https://sunda-products.s3.amazonaws.com/${row['prod_sku']}.jpeg`;
-            excelRow.push(imageUrl);
+            // let imageUrl = `https://sunda-products.s3.amazonaws.com/${row['prod_sku']}.jpeg`;
+            // excelRow.push(imageUrl);
+            excelRow.push('');
           }
         })
         excelData.push(excelRow)
