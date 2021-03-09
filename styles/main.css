@@ -52,6 +52,7 @@
 .upload-btn.disabled {
   cursor: default;
   background: #777778;
+  pointer-events: none;
 }
 
 .loader {
