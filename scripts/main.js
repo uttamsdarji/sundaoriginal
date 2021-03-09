@@ -69,7 +69,7 @@ $(document).ready(function() {
         admin_charge: null,
         sprice: 'Sales Price',
         brand_id: 'Company',
-        featured_image: null,
+        featured_image: 'S3 Image',
         image_1: null,
         image_2: null,
         image_3: null
@@ -81,7 +81,12 @@ $(document).ready(function() {
         Object.keys(columnKeyMapping).forEach((columnKey) => {
           if(columnKeyMapping[columnKey]) {
             if(['price','saleprice'].indexOf(columnKey) == -1) {
-              row.push(item[columnKeyMapping[columnKey]])
+              if(columnKey == 'featured_image') {
+                let imageUrl = `https://sunda-products.s3.amazonaws.com/${item[columnKeyMapping['prod_sku']]}.jpeg`;
+                row.push(imageUrl);
+              } else {
+                row.push(item[columnKeyMapping[columnKey]])
+              }
             } else {
               let mrp = item['Sales Price']*1.05;
               if(columnKey == 'price') {
