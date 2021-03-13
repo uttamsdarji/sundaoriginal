@@ -173,7 +173,7 @@ $(document).ready(function() {
               if(columnKey == 'price') {
                 mrp = mrp*1.4;
               }
-              row.push(mrp && mrp.toFixed(0) || ''); 
+              row.push(mrp && Math.ceil(mrp) || ''); 
             }
           } else {
             if(defaultValues.hasOwnProperty(columnKey)) {
@@ -339,7 +339,7 @@ $(document).ready(function() {
       let salesPrice = 1.05*adminPrice;
       let mrp = 1.4*salesPrice;
       let adminCharge = 0;
-      row = [i.id,i.name,0,'',i.prod_sku,5,mrp.toFixed(0),salesPrice.toFixed(0),gstCharge,adminCharge,adminPrice]
+      row = [i.id,i.name,0,'',i.prod_sku,5,Math.ceil(mrp),Math.ceil(salesPrice),gstCharge,adminCharge,adminPrice]
       if(i.sprice != adminPrice) {
         excelData.push(row)
       }
