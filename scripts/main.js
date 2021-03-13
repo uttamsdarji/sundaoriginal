@@ -444,7 +444,6 @@ $(document).ready(function() {
       // }
       // let fileName = 'product_images_update.xlsx';
       // saveAs(new Blob([sheetToArrayBuffer(wbout)], { type: "application/octet-stream" }), fileName);
-      $('#loader').addClass('hide');
     }
   }
   let websiteFileInput = document.querySelector('#websiteFile');
