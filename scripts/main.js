@@ -75,6 +75,7 @@ $(document).ready(function() {
           let successCb = () => {
             currentImageCount++;
             if(currentImageCount >= totalRows) {
+              dataWithImages = dataWithImages.filter(i => !!i)
               exportExcel({...options, excelData: dataWithImages})
               currentImageCount = 0;
               $('#loader').addClass('hide');
@@ -82,9 +83,11 @@ $(document).ready(function() {
           }
           let errorCb = () => {
             currentImageCount++;
-            dataWithImages = dataWithImages.slice(0,index).concat(dataWithImages.slice(index+1,dataWithImages.length))
+            // dataWithImages = dataWithImages.slice(0,index).concat(dataWithImages.slice(index+1,dataWithImages.length))
             // dataWithImages[index][options.imageIndex] = '';
+            dataWithImages[index] = null;
             if(currentImageCount >= totalRows) {
+              dataWithImages = dataWithImages.filter(i => !!i)
               exportExcel({...options, excelData: dataWithImages})
               currentImageCount = 0;
               $('#loader').addClass('hide');
