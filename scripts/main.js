@@ -169,7 +169,7 @@ $(document).ready(function() {
                 let imageUrl = `https://sundaoriginal.com/images/bulk_${item[columnKeyMapping['prod_sku']]}.jpeg`;
                 row.push(imageUrl);
                 newImages = true;
-              } else if(['sdesc','desc'].indexOf(columnKey) == -1) {
+              } else if(['sdesc','desc','name'].indexOf(columnKey) > -1) {
                 let desc = `${item[columnKeyMapping['name']]} (${item[columnKeyMapping['prod_sku']]})`;
                 row.push(desc);
               } else {
@@ -466,7 +466,7 @@ $(document).ready(function() {
       websiteData.forEach((row) => {
         let excelRow = [];
         columnIds.forEach(id => {
-          if(['desc','sdesc'].indexOf(id) == -1) {
+          if(['desc','sdesc','name'].indexOf(id) == -1) {
             excelRow.push(row[id]);
           } else {
             let desc = `${row['name']} (${row['prod_sku']})`;
