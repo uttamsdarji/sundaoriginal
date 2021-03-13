@@ -1,4 +1,5 @@
 $(document).ready(function() {
+  var currentImageCount = 0;
   var websiteFileReader = new FileReader();
   var softwareFileReader = new FileReader();
   var softwareData = [];
@@ -17,8 +18,85 @@ $(document).ready(function() {
     range.e.r--
     ws['!ref'] = XLSX.utils.encode_range(range.s, range.e)
   }
+  function exportExcel(options) {
+    let wb = XLSX.utils.book_new();
+    let sheetNames = ['Sheet1'];
+    sheetNames.forEach((sheet) => {
+      let workSheet = sheet || 'Data';
+      wb.SheetNames.push(workSheet);
+      let newWs = XLSX.utils.aoa_to_sheet(options.excelData);
+      wb.Sheets[workSheet] = newWs;
+    })
+    let wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'binary' });
+    function sheetToArrayBuffer(s) {
+      var buf = new ArrayBuffer(s.length); //convert s to arrayBuffer
+      var view = new Uint8Array(buf);  //create uint8array as viewer
+      for (var i = 0; i < s.length; i++) view[i] = s.charCodeAt(i) & 0xFF; //convert to octet
+      return buf;
+    }
+    let fileName = options.fileName;
+    saveAs(new Blob([sheetToArrayBuffer(wbout)], { type: "application/octet-stream" }), fileName);
+  }
+  function testImage(url, successCb, errorCb, timeoutT) {
+    return new Promise(function (resolve, reject) {
+        var timeout = timeoutT || 5000;
+        var timer, img = new Image();
+        img.onerror = img.onabort = function () {
+            // clearTimeout(timer);
+            if(errorCb) {
+              errorCb()
+            }
+            reject("error");
+        };
+        img.onload = function () {
+            // clearTimeout(timer);
+            if(successCb) {
+              successCb()
+            }
+            resolve("success");
+        };
+        // timer = setTimeout(function () {
+        //     // reset .src to invalid URL so it stops previous
+        //     // loading, but doesn't trigger new load
+        //     img.src = "//!!!!/test.jpg";
+        //     reject("timeout");
+        // }, timeout);
+        img.src = url;
+    });
+  }
+  function validateImageData(options) {
+    var dataWithImages = options.excelData;
+    if(dataWithImages && dataWithImages.length > options.numberOfHeader) {
+      let totalRows = dataWithImages.length - options.numberOfHeader;
+      // $('#loader').removeClass('hide');
+      dataWithImages.forEach((row,index) => {
+        if(index > options.numberOfHeader - 1) {
+          let imageUrl = row[options.imageIndex];
+          let successCb = () => {
+            currentImageCount++;
+            if(currentImageCount >= totalRows) {
+              exportExcel({...options, excelData: dataWithImages})
+              currentImageCount = 0;
+              $('#loader').addClass('hide');
+            }
+          }
+          let errorCb = () => {
+            currentImageCount++;
+            dataWithImages[index][options.imageIndex] = '';
+            if(currentImageCount >= totalRows) {
+              exportExcel({...options, excelData: dataWithImages})
+              currentImageCount = 0;
+              $('#loader').addClass('hide');
+            }
+          }
+          testImage(imageUrl,successCb,errorCb)
+        }
+      })
+    }
+  }
   function saveNewProducts(newProductsData) {
     let excelData = [];
+    let newImages = false;
     if(newProductsData && newProductsData.length > 0) {
       let columnIds = ['id','name','seo_desc','seo_keyword','vendor_id','status','m_cat_id','sub_cat_id','sub_cat_tw_id','inquiry','sdesc','desc','youtube_link','return_on','return_type','return_amt','ship_based','local_ship','state_ship','national_ship','gst_type','gst','hsn_code','weight','prod_type','prod_sku','qty','price','saleprice','admin_charge','sprice','brand_id','featured_image','image_1','image_2','image_3'];
       let columnNames = ['Img URL 3','Product Name','SEO Decription','SEO Keyword','1##Vednor Name','Status (on / off)','Category','Sub Category','Sub Sub Category','Add to Cartb, Buy Now, Inquiry(1,2,3)','Short Description','Long Description','Youtube URL','Return  (on / off)','Return Type (fix / per)','return_amt','Shipping Type (qty / all)','Local Shipping Charge','State Shipping Charge','National Shipping Charge','GST Type (No GST / GST)','GST %','HSN Code','Weight','Product Type (1-Simple/2-Variable/3-Catalog)','SKU Code','Qty','MRP','Sale Price','Admin Charge if Multi Vendor On','Vendor Get','Brand','Feture Img'];
@@ -83,9 +161,9 @@ $(document).ready(function() {
           if(columnKeyMapping[columnKey]) {
             if(['price','saleprice'].indexOf(columnKey) == -1) {
               if(columnKey == 'featured_image') {
-                // let imageUrl = `https://sunda-products.s3.amazonaws.com/${item[columnKeyMapping['prod_sku']]}.jpeg`;
-                // row.push(imageUrl);
-                row.push('');
+                let imageUrl = `https://sundaoriginal.com/images/bulk_${item[columnKeyMapping['prod_sku']]}.jpeg`;
+                row.push(imageUrl);
+                newImages = true;
               } else {
                 row.push(item[columnKeyMapping[columnKey]])
               }
@@ -107,23 +185,28 @@ $(document).ready(function() {
         excelData.push(row);
       })
     }
-    let wb = XLSX.utils.book_new();
-    let sheetNames = ['Sheet1'];
-    sheetNames.forEach((sheet) => {
-      let workSheet = sheet || 'Data';
-      wb.SheetNames.push(workSheet);
-      let newWs = XLSX.utils.aoa_to_sheet(excelData);
-      wb.Sheets[workSheet] = newWs;
-    })
-    let wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'binary' });
-    function sheetToArrayBuffer(s) {
-      var buf = new ArrayBuffer(s.length); //convert s to arrayBuffer
-      var view = new Uint8Array(buf);  //create uint8array as viewer
-      for (var i = 0; i < s.length; i++) view[i] = s.charCodeAt(i) & 0xFF; //convert to octet
-      return buf;
+    if(newImages) {
+      validateImageData({fileName: 'new_products.xlsx', excelData, numberOfHeader: 2, imageIndex: 32})
+    } else {
+      exportExcel({fileName: 'new_products.xlsx', excelData})
     }
-    let fileName = 'new_products.xlsx';
-    saveAs(new Blob([sheetToArrayBuffer(wbout)], { type: "application/octet-stream" }), fileName);
+    // let wb = XLSX.utils.book_new();
+    // let sheetNames = ['Sheet1'];
+    // sheetNames.forEach((sheet) => {
+    //   let workSheet = sheet || 'Data';
+    //   wb.SheetNames.push(workSheet);
+    //   let newWs = XLSX.utils.aoa_to_sheet(excelData);
+    //   wb.Sheets[workSheet] = newWs;
+    // })
+    // let wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'binary' });
+    // function sheetToArrayBuffer(s) {
+    //   var buf = new ArrayBuffer(s.length); //convert s to arrayBuffer
+    //   var view = new Uint8Array(buf);  //create uint8array as viewer
+    //   for (var i = 0; i < s.length; i++) view[i] = s.charCodeAt(i) & 0xFF; //convert to octet
+    //   return buf;
+    // }
+    // let fileName = 'new_products.xlsx';
+    // saveAs(new Blob([sheetToArrayBuffer(wbout)], { type: "application/octet-stream" }), fileName);
   }
   function saveFile(e) {
     $(`#${e.target.name}-filename`).get(0).textContent = e.target.files[0].name;
@@ -219,23 +302,24 @@ $(document).ready(function() {
       }
     })
     if(excelData.length > 1) {
-      let wb = XLSX.utils.book_new();
-      let sheetNames = ['Sheet1'];
-      sheetNames.forEach((sheet) => {
-        let workSheet = sheet || 'Data';
-        wb.SheetNames.push(workSheet);
-        let newWs = XLSX.utils.aoa_to_sheet(excelData);
-        wb.Sheets[workSheet] = newWs;
-      })
-      let wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'binary' });
-      function sheetToArrayBuffer(s) {
-        var buf = new ArrayBuffer(s.length); //convert s to arrayBuffer
-        var view = new Uint8Array(buf);  //create uint8array as viewer
-        for (var i = 0; i < s.length; i++) view[i] = s.charCodeAt(i) & 0xFF; //convert to octet
-        return buf;
-      }
-      let fileName = 'product_stock.xlsx';
-      saveAs(new Blob([sheetToArrayBuffer(wbout)], { type: "application/octet-stream" }), fileName);
+      exportExcel({fileName: 'product_stock.xlsx', excelData})
+      // let wb = XLSX.utils.book_new();
+      // let sheetNames = ['Sheet1'];
+      // sheetNames.forEach((sheet) => {
+      //   let workSheet = sheet || 'Data';
+      //   wb.SheetNames.push(workSheet);
+      //   let newWs = XLSX.utils.aoa_to_sheet(excelData);
+      //   wb.Sheets[workSheet] = newWs;
+      // })
+      // let wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'binary' });
+      // function sheetToArrayBuffer(s) {
+      //   var buf = new ArrayBuffer(s.length); //convert s to arrayBuffer
+      //   var view = new Uint8Array(buf);  //create uint8array as viewer
+      //   for (var i = 0; i < s.length; i++) view[i] = s.charCodeAt(i) & 0xFF; //convert to octet
+      //   return buf;
+      // }
+      // let fileName = 'product_stock.xlsx';
+      // saveAs(new Blob([sheetToArrayBuffer(wbout)], { type: "application/octet-stream" }), fileName);
     }
   }
   function getPriceFile(stockProducts) {
@@ -260,23 +344,24 @@ $(document).ready(function() {
       }
     })
     if(excelData.length > 1) {
-      let wb = XLSX.utils.book_new();
-      let sheetNames = ['Sheet1'];
-      sheetNames.forEach((sheet) => {
-        let workSheet = sheet || 'Data';
-        wb.SheetNames.push(workSheet);
-        let newWs = XLSX.utils.aoa_to_sheet(excelData);
-        wb.Sheets[workSheet] = newWs;
-      })
-      let wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'binary' });
-      function sheetToArrayBuffer(s) {
-        var buf = new ArrayBuffer(s.length); //convert s to arrayBuffer
-        var view = new Uint8Array(buf);  //create uint8array as viewer
-        for (var i = 0; i < s.length; i++) view[i] = s.charCodeAt(i) & 0xFF; //convert to octet
-        return buf;
-      }
-      let fileName = 'product_price.xlsx';
-      saveAs(new Blob([sheetToArrayBuffer(wbout)], { type: "application/octet-stream" }), fileName);
+      exportExcel({fileName: 'product_price.xlsx', excelData})
+      // let wb = XLSX.utils.book_new();
+      // let sheetNames = ['Sheet1'];
+      // sheetNames.forEach((sheet) => {
+      //   let workSheet = sheet || 'Data';
+      //   wb.SheetNames.push(workSheet);
+      //   let newWs = XLSX.utils.aoa_to_sheet(excelData);
+      //   wb.Sheets[workSheet] = newWs;
+      // })
+      // let wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'binary' });
+      // function sheetToArrayBuffer(s) {
+      //   var buf = new ArrayBuffer(s.length); //convert s to arrayBuffer
+      //   var view = new Uint8Array(buf);  //create uint8array as viewer
+      //   for (var i = 0; i < s.length; i++) view[i] = s.charCodeAt(i) & 0xFF; //convert to octet
+      //   return buf;
+      // }
+      // let fileName = 'product_price.xlsx';
+      // saveAs(new Blob([sheetToArrayBuffer(wbout)], { type: "application/octet-stream" }), fileName);
     }
   }
   function processData () {
@@ -296,12 +381,12 @@ $(document).ready(function() {
     let newProducts = [];
     let stockProducts = [];
     softwareData.forEach((i) => {
-      if(newProductIds.indexOf(i.Barcode) > -1) {
+      if(newProductIds.indexOf(String(i.Barcode)) > -1) {
         newProducts.push(i)
       }
     })
     websiteData.forEach((i) => {
-      if(newProductIds.indexOf(i.prod_sku) == -1) {
+      if(newProductIds.indexOf(String(i.prod_sku)) == -1) {
         stockProducts.push(i)
       }
     })
@@ -314,9 +399,9 @@ $(document).ready(function() {
     if(stockProducts && stockProducts.length > 0) {
       getPriceFile(stockProducts)
     }
-    setTimeout(() => {
-      $('#loader').addClass('hide');
-    }, 3000)
+    // setTimeout(() => {
+    //   $('#loader').addClass('hide');
+    // }, 3000)
   }
   function photoUpdate() {
     $('#loader').removeClass('hide');
@@ -334,30 +419,31 @@ $(document).ready(function() {
           if(id != 'featured_image') {
             excelRow.push(row[id]);
           } else {
-            // let imageUrl = `https://sunda-products.s3.amazonaws.com/${row['prod_sku']}.jpeg`;
-            // excelRow.push(imageUrl);
-            excelRow.push('');
+            let imageUrl = `https://sundaoriginal.com/images/bulk_${row['prod_sku']}.jpeg`;
+            excelRow.push(imageUrl);
           }
         })
         excelData.push(excelRow)
       })
-      let wb = XLSX.utils.book_new();
-      let sheetNames = ['Sheet1'];
-      sheetNames.forEach((sheet) => {
-        let workSheet = sheet || 'Data';
-        wb.SheetNames.push(workSheet);
-        let newWs = XLSX.utils.aoa_to_sheet(excelData);
-        wb.Sheets[workSheet] = newWs;
-      })
-      let wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'binary' });
-      function sheetToArrayBuffer(s) {
-        var buf = new ArrayBuffer(s.length); //convert s to arrayBuffer
-        var view = new Uint8Array(buf);  //create uint8array as viewer
-        for (var i = 0; i < s.length; i++) view[i] = s.charCodeAt(i) & 0xFF; //convert to octet
-        return buf;
-      }
-      let fileName = 'product_images_update.xlsx';
-      saveAs(new Blob([sheetToArrayBuffer(wbout)], { type: "application/octet-stream" }), fileName);
+      validateImageData({fileName: 'product_images_update.xlsx', excelData, numberOfHeader: 2, imageIndex: 32})
+      // exportExcel({fileName: 'product_images_update.xlsx', excelData})
+      // let wb = XLSX.utils.book_new();
+      // let sheetNames = ['Sheet1'];
+      // sheetNames.forEach((sheet) => {
+      //   let workSheet = sheet || 'Data';
+      //   wb.SheetNames.push(workSheet);
+      //   let newWs = XLSX.utils.aoa_to_sheet(excelData);
+      //   wb.Sheets[workSheet] = newWs;
+      // })
+      // let wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'binary' });
+      // function sheetToArrayBuffer(s) {
+      //   var buf = new ArrayBuffer(s.length); //convert s to arrayBuffer
+      //   var view = new Uint8Array(buf);  //create uint8array as viewer
+      //   for (var i = 0; i < s.length; i++) view[i] = s.charCodeAt(i) & 0xFF; //convert to octet
+      //   return buf;
+      // }
+      // let fileName = 'product_images_update.xlsx';
+      // saveAs(new Blob([sheetToArrayBuffer(wbout)], { type: "application/octet-stream" }), fileName);
       $('#loader').addClass('hide');
     }
   }
