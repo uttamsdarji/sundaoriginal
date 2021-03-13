@@ -288,6 +288,7 @@ $(document).ready(function() {
       $('#upload-btn').removeClass('disabled');
     }
     $('#photo-update-btn').removeClass('disabled');
+    $('#desc-update-btn').removeClass('disabled');
   }
   function getStockFile(stockProducts) {
     let excelData = [];
@@ -474,8 +475,8 @@ $(document).ready(function() {
         })
         excelData.push(excelRow)
       })
-      validateImageData({fileName: 'product_images_update.xlsx', excelData, numberOfHeader: 2, imageIndex: 32})
-      // exportExcel({fileName: 'product_images_update.xlsx', excelData})
+      // validateImageData({fileName: 'product_images_update.xlsx', excelData, numberOfHeader: 2, imageIndex: 32})
+      exportExcel({fileName: 'product_desc_update.xlsx', excelData})
       // let wb = XLSX.utils.book_new();
       // let sheetNames = ['Sheet1'];
       // sheetNames.forEach((sheet) => {
