@@ -113,7 +113,8 @@ $(document).ready(function() {
         gst: 5,
         hsn_code: 61,
         prod_type: '1-simple',
-        inquiry: '2-buy##'
+        inquiry: '2-buy##3-inquiry##1-cart##',
+        m_cat_id: '63-BABA SUIT'
       }
       let columnKeyMapping = {
         id: null,
