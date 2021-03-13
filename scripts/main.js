@@ -82,7 +82,8 @@ $(document).ready(function() {
           }
           let errorCb = () => {
             currentImageCount++;
-            dataWithImages[index][options.imageIndex] = '';
+            dataWithImages = dataWithImages.slice(0,index).concat(dataWithImages.slice(index+1,dataWithImages.length))
+            // dataWithImages[index][options.imageIndex] = '';
             if(currentImageCount >= totalRows) {
               exportExcel({...options, excelData: dataWithImages})
               currentImageCount = 0;
