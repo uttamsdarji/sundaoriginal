@@ -466,7 +466,7 @@ $(document).ready(function() {
       websiteData.forEach((row) => {
         let excelRow = [];
         columnIds.forEach(id => {
-          if(['desc','sdesc'].indexOf(i) == -1) {
+          if(['desc','sdesc'].indexOf(id) == -1) {
             excelRow.push(row[id]);
           } else {
             let desc = `${row['name']} (${row['prod_sku']})`;
