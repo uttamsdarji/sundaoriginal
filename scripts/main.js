@@ -341,7 +341,7 @@ $(document).ready(function() {
       let mrp = 1.4*salesPrice;
       let adminCharge = 0;
       row = [i.id,i.name,0,'',i.prod_sku,5,Math.ceil(mrp),Math.ceil(salesPrice),gstCharge,adminCharge,adminPrice]
-      if(i.sprice != adminPrice) {
+      if(Number(i.sprice) != Number(adminPrice)) {
         excelData.push(row)
       }
     })
