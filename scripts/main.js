@@ -431,7 +431,7 @@ $(document).ready(function() {
             let status = row.status;
             let quantity = row.qty;
             let photo = row.featured_image;
-            if(quantity && photo) {
+            if(quantity) {
               status = '1-on'
             } else {
               status = '0-off'
@@ -442,7 +442,7 @@ $(document).ready(function() {
             }
           }
         })
-        if(statusChanged) {
+        if(statusChanged && !row.featured_image) {
           excelData.push(excelRow)
         }
       })
