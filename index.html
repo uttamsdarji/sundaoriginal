@@ -20,7 +20,7 @@
         <div class="excel-container">
           <div class="container">
             <div class="row justify-content-center">
-              <div class="col-xl-10 col-lg-10 col-md-10 col-sm-12 col-12">
+              <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
                 <div class="upload-container">
                   <div class="custom-file">
                     <input type="file" class="custom-file-input" id="websiteFile" name="websiteFile" accept=".xlsx, .xls">
@@ -32,6 +32,11 @@
                     <label class="custom-file-label" for="softwareFile">Upload file from MARG Software</label>
                     <span class="file-name" id="softwareFile-filename"></span>
                   </div>
+                  <div class="custom-file">
+                    <input type="file" class="custom-file-input" id="localPhotos" name="localPhotos" accept=".jpeg" multiple>
+                    <label class="custom-file-label" for="localPhotos">Upload photos</label>
+                    <span class="file-name" id="localPhotos-filename"></span>
+                  </div>
                 </div>
                 <div class="upload-btn-container">
                   <button class="upload-btn disabled" id="upload-btn">
@@ -40,8 +45,14 @@
                   <button class="upload-btn disabled" id="photo-update-btn">
                     Photo Update File
                   </button>
-                  <button class="upload-btn disabled" id="desc-update-btn">
+                  <button class="upload-btn disabled" id="desc-update-btn" style="display: none">
                     Update Description
+                  </button>
+                  <button class="upload-btn disabled" id="local-photos-btn">
+                    Download New Photos
+                  </button>
+                  <button class="upload-btn disabled" id="status-update-btn">
+                    Status Update
                   </button>
                 </div>
               </div>
@@ -57,6 +68,7 @@
     <script xmlns="http://www.w3.org/1999/xhtml" async="" src="https://cdn.rawgit.com/eligrey/FileSaver.js/5ed507ef8aa53d8ecfea96d96bc7214cd2476fd2/FileSaver.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+    <script type="text/javascript" src="scripts/jszip/dist/jszip.js"></script>
     <script src="scripts/main.js"></script>
   </body>
 </html>

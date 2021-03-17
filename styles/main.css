@@ -9,11 +9,14 @@
 
 .excel-container .upload-container {
   display: flex;
-  justify-content: space-between;
+  /* justify-content: space-between; */
+  flex-wrap: wrap;
 }
 
 .excel-container .upload-container .custom-file {
   margin-right: 20px;
+  width: 350px;
+  margin-bottom: 20px;
 }
 
 .excel-container .upload-container .custom-file:last-child {
@@ -23,6 +26,9 @@
 .excel-container .upload-container .file-name {
   margin-bottom: 20px;
   display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: pre;
 }
 
 .logo-container img {
@@ -32,12 +38,14 @@
 
 .upload-btn-container {
   display: flex;
-  justify-content: space-around;
+  justify-content: space-between;
   margin-top: 50px;
+  flex-wrap: wrap;
 }
 
 .upload-btn {
   padding: 10px 20px;
+  margin-bottom: 20px;
   border-radius: 5px;
   background: #1498D5;
   border: none;

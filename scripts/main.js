@@ -1,4 +1,6 @@
 $(document).ready(function() {
+  var websiteFileRead = false;
+  var photoUploaded = false;
   var currentImageCount = 0;
   var websiteFileReader = new FileReader();
   var softwareFileReader = new FileReader();
@@ -198,23 +200,6 @@ $(document).ready(function() {
     } else {
       exportExcel({fileName: 'new_products.xlsx', excelData})
     }
-    // let wb = XLSX.utils.book_new();
-    // let sheetNames = ['Sheet1'];
-    // sheetNames.forEach((sheet) => {
-    //   let workSheet = sheet || 'Data';
-    //   wb.SheetNames.push(workSheet);
-    //   let newWs = XLSX.utils.aoa_to_sheet(excelData);
-    //   wb.Sheets[workSheet] = newWs;
-    // })
-    // let wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'binary' });
-    // function sheetToArrayBuffer(s) {
-    //   var buf = new ArrayBuffer(s.length); //convert s to arrayBuffer
-    //   var view = new Uint8Array(buf);  //create uint8array as viewer
-    //   for (var i = 0; i < s.length; i++) view[i] = s.charCodeAt(i) & 0xFF; //convert to octet
-    //   return buf;
-    // }
-    // let fileName = 'new_products.xlsx';
-    // saveAs(new Blob([sheetToArrayBuffer(wbout)], { type: "application/octet-stream" }), fileName);
   }
   function saveFile(e) {
     $(`#${e.target.name}-filename`).get(0).textContent = e.target.files[0].name;
@@ -284,10 +269,15 @@ $(document).ready(function() {
       }  
     });
     totalFilesRead++;
+    websiteFileRead = true;
+    if(photoUploaded) {
+      $('#local-photos-btn').removeClass('disabled');
+    }
     if(totalFilesRead == 2) {
       $('#upload-btn').removeClass('disabled');
     }
     $('#photo-update-btn').removeClass('disabled');
+    $('#status-update-btn').removeClass('disabled');
     $('#desc-update-btn').removeClass('disabled');
   }
   function getStockFile(stockProducts) {
@@ -312,23 +302,6 @@ $(document).ready(function() {
     })
     if(excelData.length > 1) {
       exportExcel({fileName: 'product_stock.xlsx', excelData})
-      // let wb = XLSX.utils.book_new();
-      // let sheetNames = ['Sheet1'];
-      // sheetNames.forEach((sheet) => {
-      //   let workSheet = sheet || 'Data';
-      //   wb.SheetNames.push(workSheet);
-      //   let newWs = XLSX.utils.aoa_to_sheet(excelData);
-      //   wb.Sheets[workSheet] = newWs;
-      // })
-      // let wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'binary' });
-      // function sheetToArrayBuffer(s) {
-      //   var buf = new ArrayBuffer(s.length); //convert s to arrayBuffer
-      //   var view = new Uint8Array(buf);  //create uint8array as viewer
-      //   for (var i = 0; i < s.length; i++) view[i] = s.charCodeAt(i) & 0xFF; //convert to octet
-      //   return buf;
-      // }
-      // let fileName = 'product_stock.xlsx';
-      // saveAs(new Blob([sheetToArrayBuffer(wbout)], { type: "application/octet-stream" }), fileName);
     }
   }
   function getPriceFile(stockProducts) {
@@ -354,23 +327,6 @@ $(document).ready(function() {
     })
     if(excelData.length > 1) {
       exportExcel({fileName: 'product_price.xlsx', excelData})
-      // let wb = XLSX.utils.book_new();
-      // let sheetNames = ['Sheet1'];
-      // sheetNames.forEach((sheet) => {
-      //   let workSheet = sheet || 'Data';
-      //   wb.SheetNames.push(workSheet);
-      //   let newWs = XLSX.utils.aoa_to_sheet(excelData);
-      //   wb.Sheets[workSheet] = newWs;
-      // })
-      // let wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'binary' });
-      // function sheetToArrayBuffer(s) {
-      //   var buf = new ArrayBuffer(s.length); //convert s to arrayBuffer
-      //   var view = new Uint8Array(buf);  //create uint8array as viewer
-      //   for (var i = 0; i < s.length; i++) view[i] = s.charCodeAt(i) & 0xFF; //convert to octet
-      //   return buf;
-      // }
-      // let fileName = 'product_price.xlsx';
-      // saveAs(new Blob([sheetToArrayBuffer(wbout)], { type: "application/octet-stream" }), fileName);
     }
   }
   function processData () {
@@ -408,9 +364,6 @@ $(document).ready(function() {
     if(stockProducts && stockProducts.length > 0) {
       getPriceFile(stockProducts)
     }
-    // setTimeout(() => {
-    //   $('#loader').addClass('hide');
-    // }, 3000)
   }
   function photoUpdate() {
     $('#loader').removeClass('hide');
@@ -435,28 +388,10 @@ $(document).ready(function() {
         excelData.push(excelRow)
       })
       validateImageData({fileName: 'product_images_update.xlsx', excelData, numberOfHeader: 2, imageIndex: 32})
-      // exportExcel({fileName: 'product_images_update.xlsx', excelData})
-      // let wb = XLSX.utils.book_new();
-      // let sheetNames = ['Sheet1'];
-      // sheetNames.forEach((sheet) => {
-      //   let workSheet = sheet || 'Data';
-      //   wb.SheetNames.push(workSheet);
-      //   let newWs = XLSX.utils.aoa_to_sheet(excelData);
-      //   wb.Sheets[workSheet] = newWs;
-      // })
-      // let wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'binary' });
-      // function sheetToArrayBuffer(s) {
-      //   var buf = new ArrayBuffer(s.length); //convert s to arrayBuffer
-      //   var view = new Uint8Array(buf);  //create uint8array as viewer
-      //   for (var i = 0; i < s.length; i++) view[i] = s.charCodeAt(i) & 0xFF; //convert to octet
-      //   return buf;
-      // }
-      // let fileName = 'product_images_update.xlsx';
-      // saveAs(new Blob([sheetToArrayBuffer(wbout)], { type: "application/octet-stream" }), fileName);
     }
   }
   function descUpdate() {
-    $('#loader').removeClass('hide');
+    // $('#loader').removeClass('hide');
     if(websiteData && websiteData.length > 0) {
       let columnIds = ['id','name','seo_desc','seo_keyword','vendor_id','status','m_cat_id','sub_cat_id','sub_cat_tw_id','inquiry','sdesc','desc','youtube_link','return_on','return_type','return_amt','ship_based','local_ship','state_ship','national_ship','gst_type','gst','hsn_code','weight','prod_type','prod_sku','qty','price','saleprice','admin_charge','sprice','brand_id','featured_image','image_1','image_2','image_3'];
       let columnNames = ['Img URL 3','Product Name','SEO Decription','SEO Keyword','1##Vednor Name','Status (on / off)','Category','Sub Category','Sub Sub Category','Add to Cartb, Buy Now, Inquiry(1,2,3)','Short Description','Long Description','Youtube URL','Return  (on / off)','Return Type (fix / per)','return_amt','Shipping Type (qty / all)','Local Shipping Charge','State Shipping Charge','National Shipping Charge','GST Type (No GST / GST)','GST %','HSN Code','Weight','Product Type (1-Simple/2-Variable/3-Catalog)','SKU Code','Qty','MRP','Sale Price','Admin Charge if Multi Vendor On','Vendor Get','Brand','Feture Img'];
@@ -475,35 +410,124 @@ $(document).ready(function() {
         })
         excelData.push(excelRow)
       })
-      // validateImageData({fileName: 'product_images_update.xlsx', excelData, numberOfHeader: 2, imageIndex: 32})
       exportExcel({fileName: 'product_desc_update.xlsx', excelData})
-      // let wb = XLSX.utils.book_new();
-      // let sheetNames = ['Sheet1'];
-      // sheetNames.forEach((sheet) => {
-      //   let workSheet = sheet || 'Data';
-      //   wb.SheetNames.push(workSheet);
-      //   let newWs = XLSX.utils.aoa_to_sheet(excelData);
-      //   wb.Sheets[workSheet] = newWs;
-      // })
-      // let wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'binary' });
-      // function sheetToArrayBuffer(s) {
-      //   var buf = new ArrayBuffer(s.length); //convert s to arrayBuffer
-      //   var view = new Uint8Array(buf);  //create uint8array as viewer
-      //   for (var i = 0; i < s.length; i++) view[i] = s.charCodeAt(i) & 0xFF; //convert to octet
-      //   return buf;
-      // }
-      // let fileName = 'product_images_update.xlsx';
-      // saveAs(new Blob([sheetToArrayBuffer(wbout)], { type: "application/octet-stream" }), fileName);
+    }
+  }
+  function statusUpdate() {
+    // $('#loader').removeClass('hide');
+    if(websiteData && websiteData.length > 0) {
+      let columnIds = ['id','name','seo_desc','seo_keyword','vendor_id','status','m_cat_id','sub_cat_id','sub_cat_tw_id','inquiry','sdesc','desc','youtube_link','return_on','return_type','return_amt','ship_based','local_ship','state_ship','national_ship','gst_type','gst','hsn_code','weight','prod_type','prod_sku','qty','price','saleprice','admin_charge','sprice','brand_id','featured_image','image_1','image_2','image_3'];
+      let columnNames = ['Img URL 3','Product Name','SEO Decription','SEO Keyword','1##Vednor Name','Status (on / off)','Category','Sub Category','Sub Sub Category','Add to Cartb, Buy Now, Inquiry(1,2,3)','Short Description','Long Description','Youtube URL','Return  (on / off)','Return Type (fix / per)','return_amt','Shipping Type (qty / all)','Local Shipping Charge','State Shipping Charge','National Shipping Charge','GST Type (No GST / GST)','GST %','HSN Code','Weight','Product Type (1-Simple/2-Variable/3-Catalog)','SKU Code','Qty','MRP','Sale Price','Admin Charge if Multi Vendor On','Vendor Get','Brand','Feture Img'];
+      let excelData = [];
+      excelData.push(columnIds);
+      excelData.push(columnNames);
+      websiteData.forEach((row) => {
+        let excelRow = [];
+        let statusChanged = false;
+        columnIds.forEach(id => {
+          if(['status'].indexOf(id) == -1) {
+            excelRow.push(row[id]);
+          } else {
+            let status = row.status;
+            let quantity = row.qty;
+            let photo = row.featured_image;
+            if(quantity && photo) {
+              status = '1-on'
+            } else {
+              status = '0-off'
+            }
+            excelRow.push(status);
+            if(status != row.status) {
+              statusChanged = true;
+            }
+          }
+        })
+        if(statusChanged) {
+          excelData.push(excelRow)
+        }
+      })
+      exportExcel({fileName: 'product_status_update.xlsx', excelData})
     }
   }
   let websiteFileInput = document.querySelector('#websiteFile');
   let softwareFileInput = document.querySelector('#softwareFile');
+  let localPhotosInput = document.querySelector('#localPhotos');
+
   let uploadBtn = document.querySelector('#upload-btn');
   let photoUpdateBtn = document.querySelector('#photo-update-btn');
   let descUpdateBtn = document.querySelector('#desc-update-btn');
+  let localPhotosBtn = document.querySelector('#local-photos-btn');
+  let statusUpdateBtn = document.querySelector('#status-update-btn');
+
   websiteFileInput.addEventListener('change', saveFile, false);
   softwareFileInput.addEventListener('change', saveFile, false);
+  localPhotosInput.addEventListener('change', saveLocalPhotos, false);
+
   uploadBtn.addEventListener('click', processData, false);
   photoUpdateBtn.addEventListener('click', photoUpdate, false);
   descUpdateBtn.addEventListener('click', descUpdate, false);
+  localPhotosBtn.addEventListener('click', renamePhotos, false);
+  statusUpdateBtn.addEventListener('click', statusUpdate, false);
+
+  var photoFiles = [];
+  var successIndex = [];
+  var barCodePhotos = [];
+  var remainingPhotos = [];
+
+  function saveLocalPhotos(e) {
+    photoFiles = e.target.files;
+    let fileNames = [];
+    for(let i = 0; i < photoFiles.length; i++) {
+      fileNames.push(photoFiles[i].name)
+    }
+    $(`#${e.target.name}-filename`).get(0).textContent = fileNames.join(', ');
+    photoUploaded = true;
+    if(websiteFileRead) {
+      $('#local-photos-btn').removeClass('disabled');
+    }
+  }
+
+  function renamePhotos() {
+    let productData = websiteData.map((i) => {
+      return {
+        name: i.name,
+        barcode: i.prod_sku
+      }
+    });
+    let zip = new window.JSZip();
+    let barcodePhotos = zip.folder("Barcode-Photos");
+    let remainingPhotos = zip.folder("Remaining-Photos");
+    $('#loader').removeClass('hide');
+    productData.forEach((product) => {
+      let barcode = product.barcode;
+      let name = product.name;
+      name = name.replaceAll(` (${barcode})`,'');
+      name = name.replaceAll('/','-');
+      name = name.replaceAll(' ','-');
+      name = name.replaceAll('*','-');
+      name = name.replaceAll('.','-');
+      let photoIndex = -1;
+      for(let i = 0; i < photoFiles.length; i++) {
+        let photoFileName = photoFiles[i].name;
+        photoFileName = photoFileName.replace('.jpeg');
+        if(photoFileName.toLowerCase().indexOf(name.slice(0,10).toLowerCase()) > -1) {
+          photoIndex = i;
+          successIndex.push(i)
+          break;
+        }
+      }
+      if(photoIndex > -1) {
+        barcodePhotos.file(`${barcode}.jpeg`,photoFiles[photoIndex])
+      }
+    })
+    for(let i = 0; i < photoFiles.length; i++) {
+      if(successIndex.indexOf(i) == -1) {
+        remainingPhotos.file(photoFiles[i].name,photoFiles[i])
+      }
+    }
+    zip.generateAsync({type:"blob"}).then(function(content) {
+      saveAs(content, "newLocalPhotos.zip");
+      $('#loader').addClass('hide');
+    });
+  }
 })
