@@ -510,7 +510,7 @@ $(document).ready(function() {
       for(let i = 0; i < photoFiles.length; i++) {
         let photoFileName = photoFiles[i].name;
         photoFileName = photoFileName.replace('.jpeg');
-        if(photoFileName.toLowerCase().indexOf(name.slice(0,10).toLowerCase()) > -1) {
+        if(name.toLowerCase().indexOf(photoFileName.slice(0,10).toLowerCase()) > -1) {
           photoIndex = i;
           successIndex.push(i)
           break;
