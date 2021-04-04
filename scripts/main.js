@@ -180,7 +180,7 @@ $(document).ready(function() {
             } else {
               let mrp = item['Sales Price']*1.05;
               if(columnKey == 'price') {
-                mrp = mrp*1.4;
+                mrp = mrp*1;
               }
               row.push(mrp && Math.ceil(mrp) || ''); 
             }
@@ -293,6 +293,9 @@ $(document).ready(function() {
           newStock = j['Current Stock'];
         }
       })
+      if(newStock < 0) {
+        newStock = 0;
+      }
       let stockDiff = newStock - oldStock;
       let diffType = stockDiff > 0 ? 1 : 2;
       row = [i.id,i.name,0,'',i.prod_sku,oldStock,Math.abs(stockDiff),diffType]
@@ -318,7 +321,7 @@ $(document).ready(function() {
       })
       let gstCharge = 0.05*adminPrice;
       let salesPrice = 1.05*adminPrice;
-      let mrp = 1.4*salesPrice;
+      let mrp = 1*salesPrice;
       let adminCharge = 0;
       row = [i.id,i.name,0,'',i.prod_sku,5,Math.ceil(mrp),Math.ceil(salesPrice),gstCharge,adminCharge,adminPrice]
       if(Number(i.sprice) != Number(adminPrice)) {
