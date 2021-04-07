@@ -288,12 +288,14 @@ $(document).ready(function() {
       let row = [];
       let oldStock = i.qty;
       let newStock = oldStock;
+      let productFound = false;
       softwareData.forEach((j) => {
         if(j.Barcode == i.prod_sku) {
           newStock = j['Current Stock'];
+          productFound = true;
         }
       })
-      if(newStock < 0) {
+      if(newStock < 0 || !productFound) {
         newStock = 0;
       }
       let stockDiff = newStock - oldStock;
