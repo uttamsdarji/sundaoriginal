@@ -86,8 +86,9 @@ $(document).ready(function() {
           let errorCb = () => {
             currentImageCount++;
             // dataWithImages = dataWithImages.slice(0,index).concat(dataWithImages.slice(index+1,dataWithImages.length))
-            // dataWithImages[index][options.imageIndex] = '';
-            dataWithImages[index] = null;
+            dataWithImages[index][options.imageIndex] = '';
+            dataWithImages[index][options.statusIndex] = '0-off';
+            // dataWithImages[index] = null;
             if(currentImageCount >= totalRows) {
               dataWithImages = dataWithImages.filter(i => !!i)
               exportExcel({...options, excelData: dataWithImages})
@@ -196,7 +197,7 @@ $(document).ready(function() {
       })
     }
     if(newImages) {
-      validateImageData({fileName: 'new_products.xlsx', excelData, numberOfHeader: 2, imageIndex: 32})
+      validateImageData({fileName: 'new_products.xlsx', excelData, numberOfHeader: 2, imageIndex: 32, statusIndex: 5})
     } else {
       exportExcel({fileName: 'new_products.xlsx', excelData})
     }
@@ -392,7 +393,7 @@ $(document).ready(function() {
         })
         excelData.push(excelRow)
       })
-      validateImageData({fileName: 'product_images_update.xlsx', excelData, numberOfHeader: 2, imageIndex: 32})
+      validateImageData({fileName: 'product_images_update.xlsx', excelData, numberOfHeader: 2, imageIndex: 32, statusIndex: 5})
     }
   }
   function descUpdate() {
